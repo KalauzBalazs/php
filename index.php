@@ -1,58 +1,51 @@
+
 <?php
 
-    $servername = "localhost";
-    $username = "php_teszter";
-    $password = "3bjmyQi4AyjhHwpr";
-    $dbname = "php_teszt";
+$servername = "localhost";
+$username = "php_teszter";
+$password = "a_(!._i2G)3*rNpm";
+$dbname = "php_teszt";
 
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+/* change character set to utf8 */
+if (!$conn->set_charset("utf8")) {
+    printf("Error loading character set utf8: %s\n", $conn->error);
+} 
+else {
+    // printf("Current character set: %s\n", $conn->character_set_name());
+}
 
+$name = '';
 
-/*
-        foreach ($osztaly as $kulcs => $sor){
-            foreach ($sor as $oszlop=>$nev){
-                $sql = "INSERT INTO osztaly (nev, sor, oszlop) VALUES ('$nev', $kulcs, $oszlop)";
-
-                if ($conn->query($sql) === TRUE) {
-                echo "New record created successfully";
-                } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
-                }
-        }}
-*/
-    
-
-    $name="";
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (empty($_POST["keresett_nev"])) {
-          $nameErr = "Nem írtál be nevet";
-        } else {
-            if(strlen($_POST["keresett_nev"])<2){
-                $nameErr = "Nem írtál be legalább két karaktert!";
-            }
-            else{
-                $name = $_POST["keresett_nev"];
-
-            }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (empty($_POST["keresett_nev"])) {
+      $nameErr = "Nem írtál be nevet!";
+    } 
+    else {
+        if(strlen($_POST["keresett_nev"]) < 2) {
+            $nameErr = "Nem írtál be legalább két karaktert!";
         }
-    }      
+        else $name = $_POST["keresett_nev"];
+    }
+}
+
 ?>
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="hu">
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>Ülésrend</title>
-    </head>
-
+</head>
 
 <body>
     <div>
@@ -60,13 +53,12 @@
     </div>
     <?php
 
-        if(isset($nameErr))echo $nameErr;
+    if(isset($nameErr)) echo $nameErr;
+
     ?>
-    <form action="index.php" method="post">
-        <div>
-            <input type="text" name="keresett_nev" value="<?php echo $name?>">
-            <input type="submit" value="KERESÉS">
-        </div>
+    <form action="index.php" method="post" class="input-group dp-flex justify-content-center p-2">
+        <input type="text" name="keresett_nev" value="<?php echo $name; ?>" class="input-group-text">
+        <input type="submit" value="KERESÉS" class="btn btn-primary">
     </form>
     <table class="table">
         <thead>
@@ -93,7 +85,6 @@
 
                 // output data of each row
                 while($row = $result->fetch_assoc()) {
-                    // echo "id: " . $row["id"]. " - Name: " . $row["nev"]. " " . $row["sor"]. "  " . $row["oszlop"]." <br>";
 
                     if($sor !== $row["sor"]) {
                         if($sor !== NULL) {
@@ -105,20 +96,22 @@
                             <?php
                         $sor = $row["sor"];
                     }
-                    $class="";
-                    if(!empty($name)){
-                        if(strpos($row["nev"],$name)!==false){
-                            $class='class="border border-info"';
+
+                    $class = '';
+                    if(!empty($name)) {
+                        if(strpos($row["nev"],$name) !== FALSE) {
+                            $class = ' class="border border-info"';  
                         }
                     }
-                    echo "<td $class>" . $row["nev"]. "</td>";
+
+                    echo "<td".$class.">" . $row["nev"]. "</td>";
                     if($row["oszlop"] == 0 or $row["oszlop"] == 2) {
                         echo "<td> </td>";
                     }
                 }
             } 
             else {
-                echo "0 results";
+            echo "0 results";
             }
 
             ?>
@@ -138,5 +131,7 @@
 
 </html>
 <?php
+
 $conn->close();
+
 ?>
